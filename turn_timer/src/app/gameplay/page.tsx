@@ -7,6 +7,7 @@ import Timer from '@/components/Timer'
 import ControlButtons from '@/components/ControlButtons'
 import { Button } from '@/components/ui/button'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog'
+import { useSettings } from '@/contexts/SettingsContext'
 
 interface Player {
   id: string
@@ -15,29 +16,23 @@ interface Player {
 
 export default function Gameplay() {
   const router = useRouter()
+  const { settings } = useSettings()
   const [isRunning, setIsRunning] = useState(true)
   const [players, setPlayers] = useState<Player[]>([])
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0)
-  const [timeLeft, setTimeLeft] = useState(60)
-  const [addTimeInterval, setAddTimeInterval] = useState(10)
-  const [turnDuration, setTurnDuration] = useState(60)
+  const [timeLeft, setTimeLeft] = useState(settings.turnDuration)
 
   useEffect(() => {
     const storedPlayers = localStorage.getItem('players')
-    const storedAddTimeInterval = localStorage.getItem('addTimeInterval')
-    const storedTurnDuration = localStorage.getItem('turnDuration')
     if (storedPlayers) {
       setPlayers(JSON.parse(storedPlayers))
     }
-    if (storedAddTimeInterval) {
-      setAddTimeInterval(JSON.parse(storedAddTimeInterval))
-    }
-    if (storedTurnDuration) {
-      const duration = JSON.parse(storedTurnDuration)
-      setTurnDuration(duration)
-      setTimeLeft(duration)
-    }
   }, [])
+
+  // Update timeLeft when turnDuration changes in settings
+  useEffect(() => {
+    setTimeLeft(settings.turnDuration)
+  }, [settings.turnDuration])
 
   const currentPlayer = players[currentPlayerIndex]
   const nextPlayer = players[(currentPlayerIndex + 1) % players.length]
@@ -46,14 +41,20 @@ export default function Gameplay() {
   const handleSkip = () => {
     setCurrentPlayerIndex((prevIndex) => (prevIndex + 1) % players.length)
     setIsRunning(true)
-    setTimeLeft(turnDuration)
+    setTimeLeft(settings.turnDuration)
   }
   const handleAddTime = () => {
-    setTimeLeft((prevTime) => prevTime + addTimeInterval)
+    setTimeLeft((prevTime) => prevTime + settings.addTimeInterval)
   }
   const handleTimeUp = () => {
-    handleSkip()
+    if (settings.autoStart) {
+      handleSkip()
+    } else {
+      setIsRunning(false)
+      setTimeLeft(settings.turnDuration)
+    }
   }
+
   const handleNextTurn = () => {
     handleSkip()
   }
@@ -69,13 +70,13 @@ export default function Gameplay() {
   return (
     <Layout title={`${currentPlayer.name}'s Turn`}>
       <div className="space-y-8">
-        <Timer duration={turnDuration} timeLeft={timeLeft} setTimeLeft={setTimeLeft} onTimeUp={handleTimeUp} isRunning={isRunning} />
+        <Timer duration={settings.turnDuration} timeLeft={timeLeft} setTimeLeft={setTimeLeft} onTimeUp={handleTimeUp} isRunning={isRunning} />
         <ControlButtons
           onStart={handleStart}
           onSkip={handleSkip}
           onAddTime={handleAddTime}
           isRunning={isRunning}
-          addTimeInterval={addTimeInterval}
+          addTimeInterval={settings.addTimeInterval}
         />
         <div className="text-center text-muted-foreground">
           Next: {nextPlayer.name}
@@ -83,7 +84,13 @@ export default function Gameplay() {
         <div className="flex justify-center">
           <Button onClick={handleNextTurn} size="lg">Next Turn</Button>
         </div>
-        <div className="flex justify-end">
+        <div className="flex justify-between">
+          <Button
+            variant="outline"
+            onClick={() => router.push('/settings?returnTo=/gameplay')}
+          >
+            Settings
+          </Button>
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button variant="outline">End Game</Button>
