@@ -8,6 +8,7 @@ import ControlButtons from '@/components/ControlButtons'
 import { Button } from '@/components/ui/button'
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog'
 import { useSettings } from '@/contexts/SettingsContext'
+import { usePlayers } from '@/contexts/PlayerContext'
 
 interface Player {
   id: string
@@ -17,17 +18,10 @@ interface Player {
 export default function Gameplay() {
   const router = useRouter()
   const { settings } = useSettings()
+  const { players } = usePlayers()
   const [isRunning, setIsRunning] = useState(true)
-  const [players, setPlayers] = useState<Player[]>([])
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0)
   const [timeLeft, setTimeLeft] = useState(settings.turnDuration)
-
-  useEffect(() => {
-    const storedPlayers = localStorage.getItem('players')
-    if (storedPlayers) {
-      setPlayers(JSON.parse(storedPlayers))
-    }
-  }, [])
 
   // Update timeLeft when turnDuration changes in settings
   useEffect(() => {

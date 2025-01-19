@@ -7,11 +7,7 @@ import { Plus, Minus, GripVertical } from 'lucide-react'
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
 import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-
-interface Player {
-  id: string
-  name: string
-}
+import { usePlayers } from '@/contexts/PlayerContext'
 
 interface SortableItemProps {
   id: string
@@ -28,18 +24,28 @@ function SortableItem({ id, name, onRemove }: SortableItemProps) {
   }
 
   return (
-    <li ref={setNodeRef} style={style} {...attributes} {...listeners} className="flex items-center space-x-2 bg-secondary p-2 rounded">
-      <GripVertical size={16} className="cursor-move" />
-      <span className="flex-grow">{name}</span>
-      <Button variant="ghost" size="sm" onClick={() => onRemove(id)}>
+    <div className="flex items-center space-x-2">
+      <li ref={setNodeRef} style={style} {...attributes} {...listeners} className="flex-grow flex items-center space-x-2 bg-secondary p-2 rounded">
+        <GripVertical size={16} className="cursor-move" />
+        <span className="flex-grow">{name}</span>
+      </li>
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={(e) => {
+          e.preventDefault()
+          e.stopPropagation()
+          onRemove(id)
+        }}
+      >
         <Minus size={16} />
       </Button>
-    </li>
+    </div>
   )
 }
 
-export default function PlayerList({ initialPlayers = [], onPlayersChange }: { initialPlayers?: Player[], onPlayersChange?: (players: Player[]) => void }) {
-  const [players, setPlayers] = useState<Player[]>(initialPlayers)
+export default function PlayerList() {
+  const { players, addPlayer, removePlayer, reorderPlayers } = usePlayers()
   const [newPlayerName, setNewPlayerName] = useState('')
 
   const sensors = useSensors(
@@ -49,36 +55,25 @@ export default function PlayerList({ initialPlayers = [], onPlayersChange }: { i
     })
   )
 
-  const addPlayer = () => {
+  const handleAddPlayer = () => {
     if (newPlayerName.trim()) {
-      const updatedPlayers = [...players, { id: Date.now().toString(), name: newPlayerName.trim() }]
-      setPlayers(updatedPlayers)
+      addPlayer(newPlayerName)
       setNewPlayerName('')
-      onPlayersChange?.(updatedPlayers)
     }
-  }
-
-  const removePlayer = (id: string) => {
-    const updatedPlayers = players.filter(player => player.id !== id)
-    setPlayers(updatedPlayers)
-    onPlayersChange?.(updatedPlayers)
   }
 
   const handleDragEnd = (event: any) => {
     const { active, over } = event
 
     if (active.id !== over.id) {
-      setPlayers((items) => {
-        const oldIndex = items.findIndex((item) => item.id === active.id)
-        const newIndex = items.findIndex((item) => item.id === over.id)
+      const oldIndex = players.findIndex((item) => item.id === active.id)
+      const newIndex = players.findIndex((item) => item.id === over.id)
 
-        const newItems = [...items]
-        const [reorderedItem] = newItems.splice(oldIndex, 1)
-        newItems.splice(newIndex, 0, reorderedItem)
+      const newItems = [...players]
+      const [reorderedItem] = newItems.splice(oldIndex, 1)
+      newItems.splice(newIndex, 0, reorderedItem)
 
-        onPlayersChange?.(newItems)
-        return newItems
-      })
+      reorderPlayers(newItems)
     }
   }
 
@@ -92,11 +87,11 @@ export default function PlayerList({ initialPlayers = [], onPlayersChange }: { i
           placeholder="Enter player name"
           onKeyDown={(e) => {
             if (e.key === 'Enter') {
-              addPlayer()
+              handleAddPlayer()
             }
           }}
         />
-        <Button onClick={addPlayer}><Plus size={16} /></Button>
+        <Button onClick={handleAddPlayer}><Plus size={16} /></Button>
       </div>
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext items={players} strategy={verticalListSortingStrategy}>
