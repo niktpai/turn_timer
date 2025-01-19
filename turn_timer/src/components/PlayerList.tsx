@@ -90,6 +90,11 @@ export default function PlayerList({ initialPlayers = [], onPlayersChange }: { i
           value={newPlayerName}
           onChange={(e) => setNewPlayerName(e.target.value)}
           placeholder="Enter player name"
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              addPlayer()
+            }
+          }}
         />
         <Button onClick={addPlayer}><Plus size={16} /></Button>
       </div>
@@ -105,4 +110,3 @@ export default function PlayerList({ initialPlayers = [], onPlayersChange }: { i
     </div>
   )
 }
-
