@@ -7,12 +7,13 @@ interface ControlButtonsProps {
   onSkip: () => void
   isRunning: boolean
   addTimeInterval: number
+  autoStart: boolean
 }
 
-export default function ControlButtons({ onStart, onAddTime, onSkip, isRunning, addTimeInterval }: ControlButtonsProps) {
+export default function ControlButtons({ onStart, onAddTime, onSkip, isRunning, addTimeInterval, autoStart }: ControlButtonsProps) {
   return (
     <div className="flex justify-center space-x-4">
-      {!isRunning && (
+      {!isRunning && !autoStart && (
         <Button onClick={onStart}>
           <Play className="mr-2 h-4 w-4" /> Start
         </Button>

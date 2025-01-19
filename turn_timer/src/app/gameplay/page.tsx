@@ -19,7 +19,7 @@ export default function Gameplay() {
   const router = useRouter()
   const { settings } = useSettings()
   const { players } = usePlayers()
-  const [isRunning, setIsRunning] = useState(true)
+  const [isRunning, setIsRunning] = useState(settings.autoStart)
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0)
   const [timeLeft, setTimeLeft] = useState(settings.turnDuration)
 
@@ -34,7 +34,7 @@ export default function Gameplay() {
   const handleStart = () => setIsRunning(true)
   const handleSkip = () => {
     setCurrentPlayerIndex((prevIndex) => (prevIndex + 1) % players.length)
-    setIsRunning(true)
+    setIsRunning(settings.autoStart)
     setTimeLeft(settings.turnDuration)
   }
   const handleAddTime = () => {
@@ -71,6 +71,7 @@ export default function Gameplay() {
           onAddTime={handleAddTime}
           isRunning={isRunning}
           addTimeInterval={settings.addTimeInterval}
+          autoStart={settings.autoStart}
         />
         <div className="text-center text-muted-foreground">
           Next: {nextPlayer.name}
