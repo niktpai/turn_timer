@@ -31,12 +31,10 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     useEffect(() => {
         // Load saved settings on mount
         const storedAutoStart = localStorage.getItem('autoStart')
-        const storedAddTimeInterval = localStorage.getItem('addTimeInterval')
-        const storedTurnDuration = localStorage.getItem('turnDuration')
 
         const loadedSettings = {
             autoStart: storedAutoStart ? JSON.parse(storedAutoStart) : defaultSettings.autoStart,
-            addTimeInterval: storedAddTimeInterval ? JSON.parse(storedAddTimeInterval) : defaultSettings.addTimeInterval,
+            addTimeInterval: defaultSettings.addTimeInterval, // Always use default value (10) for addTimeInterval
             turnDuration: defaultSettings.turnDuration, // Always use default value (60) for turnDuration
         }
 
@@ -53,8 +51,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     const saveChanges = () => {
         // Save to localStorage and update current settings
         localStorage.setItem('autoStart', JSON.stringify(tempSettings.autoStart))
-        localStorage.setItem('addTimeInterval', JSON.stringify(tempSettings.addTimeInterval))
-        // Don't save turnDuration to localStorage so it resets to 60 for new sessions
+        // Don't save addTimeInterval or turnDuration to localStorage so they reset to defaults for new sessions
         setSettings(tempSettings)
     }
 
