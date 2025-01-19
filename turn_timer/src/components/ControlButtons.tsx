@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button'
-import { Play, Plus, SkipForward, Pause } from 'lucide-react'
+import { Play, Plus, Pause } from 'lucide-react'
 
 interface ControlButtonsProps {
   onStart: () => void
@@ -29,9 +29,6 @@ export default function ControlButtons({ onStart, onAddTime, onSkip, onPause, is
         <>
           <Button onClick={onAddTime}>
             <Plus className="mr-2 h-4 w-4" /> {addTimeInterval}s
-          </Button>
-          <Button onClick={onSkip} variant="secondary">
-            <SkipForward className="mr-2 h-4 w-4" /> Skip
           </Button>
           <Button onClick={onPause} variant="secondary">
             <Pause className="mr-2 h-4 w-4" /> Pause
