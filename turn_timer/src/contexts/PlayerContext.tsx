@@ -1,10 +1,11 @@
 'use client'
 
-import { createContext, useContext, useState, ReactNode } from 'react'
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
 
 interface Player {
     id: string
     name: string
+    order: number
 }
 
 interface PlayerContextType {
@@ -12,26 +13,50 @@ interface PlayerContextType {
     addPlayer: (name: string) => void
     removePlayer: (id: string) => void
     reorderPlayers: (newPlayers: Player[]) => void
+    resetPlayers: () => void
 }
 
 const PlayerContext = createContext<PlayerContextType | undefined>(undefined)
 
 export function PlayerProvider({ children }: { children: ReactNode }) {
-    const [players, setPlayers] = useState<Player[]>([])
+    const [players, setPlayers] = useState<Player[]>(() => {
+        if (typeof window !== 'undefined') {
+            const savedPlayers = sessionStorage.getItem('players')
+            return savedPlayers ? JSON.parse(savedPlayers) : []
+        }
+        return []
+    })
+
+    useEffect(() => {
+        sessionStorage.setItem('players', JSON.stringify(players))
+    }, [players])
 
     const addPlayer = (name: string) => {
         if (name.trim()) {
-            const newPlayer = { id: Date.now().toString(), name: name.trim() }
-            setPlayers(prev => [...prev, newPlayer])
+            const newPlayer = {
+                id: Date.now().toString(),
+                name: name.trim(),
+                order: players.length
+            }
+            setPlayers([...players, newPlayer])
         }
     }
 
     const removePlayer = (id: string) => {
-        setPlayers(prev => prev.filter(player => player.id !== id))
+        setPlayers(players.filter(player => player.id !== id))
     }
 
     const reorderPlayers = (newPlayers: Player[]) => {
-        setPlayers(newPlayers)
+        const reorderedPlayers = newPlayers.map((player, index) => ({
+            ...player,
+            order: index
+        }))
+        setPlayers(reorderedPlayers)
+    }
+
+    const resetPlayers = () => {
+        setPlayers([])
+        sessionStorage.removeItem('players')
     }
 
     return (
@@ -40,7 +65,8 @@ export function PlayerProvider({ children }: { children: ReactNode }) {
                 players,
                 addPlayer,
                 removePlayer,
-                reorderPlayers
+                reorderPlayers,
+                resetPlayers
             }}
         >
             {children}

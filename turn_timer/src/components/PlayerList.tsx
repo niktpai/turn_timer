@@ -91,7 +91,9 @@ export default function PlayerList() {
             }
           }}
         />
-        <Button onClick={handleAddPlayer}><Plus size={16} /></Button>
+        <Button onClick={handleAddPlayer}>
+          <Plus size={16} />
+        </Button>
       </div>
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext items={players} strategy={verticalListSortingStrategy}>

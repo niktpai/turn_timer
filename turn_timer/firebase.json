@@ -4,19 +4,12 @@
     "indexes": "firestore.indexes.json"
   },
   "hosting": {
-    "public": ".next",
+    "source": ".",
     "ignore": [
       "firebase.json",
       "**/.*",
       "**/node_modules/**",
-      "**/.git/**",
-      "**/src/**"
-    ],
-    "rewrites": [
-      {
-        "source": "**",
-        "destination": "/$1"
-      }
+      "**/.git/**"
     ],
     "frameworksBackend": {
       "region": "us-central1",
