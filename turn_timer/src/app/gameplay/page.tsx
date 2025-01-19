@@ -79,13 +79,7 @@ export default function Gameplay() {
         <div className="flex justify-center">
           <Button onClick={handleNextTurn} size="lg">Next Turn</Button>
         </div>
-        <div className="flex justify-between">
-          <Button
-            variant="outline"
-            onClick={() => router.push('/settings?returnTo=/gameplay')}
-          >
-            Settings
-          </Button>
+        <div className="flex justify-end">
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button variant="outline">End Game</Button>
