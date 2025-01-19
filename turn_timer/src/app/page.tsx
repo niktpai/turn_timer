@@ -39,13 +39,7 @@ export default function Home() {
     <Layout title="Turn Timer">
       <div className="space-y-8">
         <PlayerList initialPlayers={players} onPlayersChange={handlePlayersChange} />
-        <div className="flex justify-between">
-          <Button
-            variant="outline"
-            onClick={() => router.push('/settings?returnTo=/')}
-          >
-            Settings
-          </Button>
+        <div className="flex justify-end">
           <Button size="lg" onClick={handleStartGame}>Start Game</Button>
         </div>
       </div>
