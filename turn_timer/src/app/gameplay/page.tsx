@@ -100,7 +100,7 @@ export default function Gameplay() {
               <AlertDialogHeader>
                 <AlertDialogTitle>Are you sure you want to end the game?</AlertDialogTitle>
                 <AlertDialogDescription>
-                  This action cannot be undone. You'll be redirected to the history and stats page.
+                  This action cannot be undone.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
