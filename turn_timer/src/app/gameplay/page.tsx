@@ -20,6 +20,7 @@ export default function Gameplay() {
   const { settings } = useSettings()
   const { players } = usePlayers()
   const [isRunning, setIsRunning] = useState(settings.autoStart)
+  const [isPaused, setIsPaused] = useState(false)
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0)
   const [timeLeft, setTimeLeft] = useState(settings.turnDuration)
 
@@ -31,10 +32,19 @@ export default function Gameplay() {
   const currentPlayer = players[currentPlayerIndex]
   const nextPlayer = players[(currentPlayerIndex + 1) % players.length]
 
-  const handleStart = () => setIsRunning(true)
+  const handleStart = () => {
+    setIsRunning(true)
+    setIsPaused(false)
+  }
+
+  const handlePause = () => {
+    setIsRunning(false)
+    setIsPaused(true)
+  }
   const handleSkip = () => {
     setCurrentPlayerIndex((prevIndex) => (prevIndex + 1) % players.length)
     setIsRunning(settings.autoStart)
+    setIsPaused(false)
     setTimeLeft(settings.turnDuration)
   }
   const handleAddTime = () => {
@@ -69,7 +79,9 @@ export default function Gameplay() {
           onStart={handleStart}
           onSkip={handleSkip}
           onAddTime={handleAddTime}
+          onPause={handlePause}
           isRunning={isRunning}
+          isPaused={isPaused}
           addTimeInterval={settings.addTimeInterval}
           autoStart={settings.autoStart}
         />
