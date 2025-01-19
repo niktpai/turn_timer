@@ -33,7 +33,7 @@ export default function Timer({ duration, timeLeft, setTimeLeft, onTimeUp, isRun
   const minutes = Math.floor(timeLeft / 60)
   const seconds = timeLeft % 60
 
-  const progressPercentage = (timeLeft / duration) * 100
+  const progressPercentage = Math.min((timeLeft / duration) * 100, 100)
 
   return (
     <div className="text-center space-y-4">
