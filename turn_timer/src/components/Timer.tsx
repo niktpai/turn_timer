@@ -38,7 +38,7 @@ export default function Timer({ duration, timeLeft, setTimeLeft, onTimeUp, isRun
   return (
     <div className="text-center space-y-4">
       <div className="text-6xl font-bold tabular-nums">
-        {minutes.toString().padStart(2, '0')}:{seconds.toString().padStart(2, '0')}
+        {minutes > 0 ? `${minutes}:${seconds.toString().padStart(2, '0')}` : seconds}
       </div>
       <div className="w-full bg-secondary rounded-full h-2.5">
         <div
@@ -49,4 +49,3 @@ export default function Timer({ duration, timeLeft, setTimeLeft, onTimeUp, isRun
     </div>
   )
 }
-

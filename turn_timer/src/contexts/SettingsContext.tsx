@@ -37,7 +37,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
         const loadedSettings = {
             autoStart: storedAutoStart ? JSON.parse(storedAutoStart) : defaultSettings.autoStart,
             addTimeInterval: storedAddTimeInterval ? JSON.parse(storedAddTimeInterval) : defaultSettings.addTimeInterval,
-            turnDuration: storedTurnDuration ? JSON.parse(storedTurnDuration) : defaultSettings.turnDuration,
+            turnDuration: defaultSettings.turnDuration, // Always use default value (60) for turnDuration
         }
 
         setSettings(loadedSettings)
@@ -54,7 +54,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
         // Save to localStorage and update current settings
         localStorage.setItem('autoStart', JSON.stringify(tempSettings.autoStart))
         localStorage.setItem('addTimeInterval', JSON.stringify(tempSettings.addTimeInterval))
-        localStorage.setItem('turnDuration', JSON.stringify(tempSettings.turnDuration))
+        // Don't save turnDuration to localStorage so it resets to 60 for new sessions
         setSettings(tempSettings)
     }
 

@@ -1,6 +1,7 @@
 'use client'
 
 import { useRouter, useSearchParams } from 'next/navigation'
+import { useState } from 'react'
 import Layout from '@/components/Layout'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
@@ -21,6 +22,8 @@ export default function Settings({ players = [] }: Props) {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { settings, updateSettings, hasUnsavedChanges, saveChanges, resetChanges } = useSettings()
+  const [turnDurationInput, setTurnDurationInput] = useState(settings.turnDuration.toString())
+  const [addTimeInput, setAddTimeInput] = useState(settings.addTimeInterval.toString())
 
   // Get the return path from URL params, default to home page
   const returnTo = searchParams.get('returnTo') || '/'
@@ -52,18 +55,44 @@ export default function Settings({ players = [] }: Props) {
           <Label htmlFor="turn-duration">Turn Duration (seconds)</Label>
           <Input
             id="turn-duration"
-            type="number"
-            value={settings.turnDuration}
-            onChange={(e) => updateSettings({ ...settings, turnDuration: Number(e.target.value) })}
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            value={turnDurationInput}
+            onChange={(e) => {
+              const value = e.target.value
+              setTurnDurationInput(value)
+              if (value === '') {
+                updateSettings({ ...settings, turnDuration: 1 })
+              } else {
+                const num = parseInt(value)
+                if (!isNaN(num) && num > 0) {
+                  updateSettings({ ...settings, turnDuration: num })
+                }
+              }
+            }}
           />
         </div>
         <div className="space-y-2">
           <Label htmlFor="add-time-interval">Add Time Interval (seconds)</Label>
           <Input
             id="add-time-interval"
-            type="number"
-            value={settings.addTimeInterval}
-            onChange={(e) => updateSettings({ ...settings, addTimeInterval: Number(e.target.value) })}
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            value={addTimeInput}
+            onChange={(e) => {
+              const value = e.target.value
+              setAddTimeInput(value)
+              if (value === '') {
+                updateSettings({ ...settings, addTimeInterval: 0 })
+              } else {
+                const num = parseInt(value)
+                if (!isNaN(num) && num >= 0) {
+                  updateSettings({ ...settings, addTimeInterval: num })
+                }
+              }
+            }}
           />
         </div>
         <div className="space-y-2">
