@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter } from 'next/navigation'
 import Layout from '@/components/Layout'
 import Timer from '@/components/Timer'
@@ -10,12 +10,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { useSettings } from '@/contexts/SettingsContext'
 import { usePlayers } from '@/contexts/PlayerContext'
 
-interface Player {
-  id: string
-  name: string
-}
-
-export default function Gameplay() {
+function GameplayContent() {
   const router = useRouter()
   const { settings } = useSettings()
   const { players } = usePlayers()
@@ -29,8 +24,16 @@ export default function Gameplay() {
     setTimeLeft(settings.turnDuration)
   }, [settings.turnDuration])
 
-  const currentPlayer = players[currentPlayerIndex]
+  // Ensure we have valid player indices
+  const currentPlayer = players[currentPlayerIndex % players.length]
   const nextPlayer = players[(currentPlayerIndex + 1) % players.length]
+
+  // Update component when players or current player changes
+  useEffect(() => {
+    if (currentPlayerIndex >= players.length) {
+      setCurrentPlayerIndex(0)
+    }
+  }, [currentPlayerIndex, players])
 
   const handleStart = () => {
     setIsRunning(true)
@@ -41,34 +44,40 @@ export default function Gameplay() {
     setIsRunning(false)
     setIsPaused(true)
   }
-  const handleSkip = () => {
-    setCurrentPlayerIndex((prevIndex) => (prevIndex + 1) % players.length)
-    setIsRunning(settings.autoStart)
-    setIsPaused(false)
+
+  const updateToNextPlayer = () => {
+    const nextIndex = (currentPlayerIndex + 1) % players.length
+    setCurrentPlayerIndex(nextIndex)
     setTimeLeft(settings.turnDuration)
+    setIsPaused(false)
+    setIsRunning(settings.autoStart)
   }
+
   const handleAddTime = () => {
     setTimeLeft((prevTime) => prevTime + settings.addTimeInterval)
   }
+
   const handleTimeUp = () => {
-    if (settings.autoStart) {
-      handleSkip()
-    } else {
-      setIsRunning(false)
-      setTimeLeft(settings.turnDuration)
-    }
+    setIsRunning(false)
+    setTimeLeft(0)
+    setIsPaused(false)
+    updateToNextPlayer()
   }
 
   const handleNextTurn = () => {
-    handleSkip()
+    updateToNextPlayer()
   }
 
   const handleEndGame = () => {
     router.push('/history')
   }
 
-  if (players.length === 0) {
-    return <div>Loading...</div>
+  if (!players || players.length === 0) {
+    return <div className="text-center p-4">No players available. Please add players in the settings.</div>
+  }
+
+  if (!currentPlayer || !nextPlayer) {
+    return <div className="text-center p-4">Loading players...</div>
   }
 
   return (
@@ -77,7 +86,6 @@ export default function Gameplay() {
         <Timer duration={settings.turnDuration} timeLeft={timeLeft} setTimeLeft={setTimeLeft} onTimeUp={handleTimeUp} isRunning={isRunning} />
         <ControlButtons
           onStart={handleStart}
-          onSkip={handleSkip}
           onAddTime={handleAddTime}
           onPause={handlePause}
           isRunning={isRunning}
@@ -112,5 +120,13 @@ export default function Gameplay() {
         </div>
       </div>
     </Layout>
+  )
+}
+
+export default function Gameplay() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <GameplayContent />
+    </Suspense>
   )
 }

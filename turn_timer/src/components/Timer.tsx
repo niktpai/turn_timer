@@ -1,7 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { Button } from '@/components/ui/button'
+import { useEffect } from 'react'
 
 interface TimerProps {
   duration: number
@@ -18,12 +17,14 @@ export default function Timer({ duration, timeLeft, setTimeLeft, onTimeUp, isRun
     if (isRunning && timeLeft > 0) {
       timer = setInterval(() => {
         setTimeLeft((prevTime) => {
-          if (prevTime <= 1) {
+          const newTime = prevTime - 1
+          if (newTime <= 0) {
             clearInterval(timer)
-            onTimeUp()
+            // Call onTimeUp on the next tick to ensure clean state update
+            setTimeout(onTimeUp, 0)
             return 0
           }
-          return prevTime - 1
+          return newTime
         })
       }, 1000)
     }

@@ -1,13 +1,14 @@
 import Link from 'next/link'
 import { Settings, X } from 'lucide-react'
 import { usePathname, useSearchParams } from 'next/navigation'
+import { Suspense } from 'react'
 
 interface LayoutProps {
   children: React.ReactNode
   title: string
 }
 
-export default function Layout({ children, title }: LayoutProps) {
+function LayoutContent({ children, title }: LayoutProps) {
   const pathname = usePathname()
   const isSettingsPage = pathname === '/settings'
   const searchParams = useSearchParams()
@@ -29,5 +30,13 @@ export default function Layout({ children, title }: LayoutProps) {
       </header>
       <main className="p-4">{children}</main>
     </div>
+  )
+}
+
+export default function Layout(props: LayoutProps) {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <LayoutContent {...props} />
+    </Suspense>
   )
 }

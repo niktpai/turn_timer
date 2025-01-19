@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Plus, Minus, GripVertical } from 'lucide-react'
-import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core'
 import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy, useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { usePlayers } from '@/contexts/PlayerContext'
@@ -62,12 +62,12 @@ export default function PlayerList() {
     }
   }
 
-  const handleDragEnd = (event: any) => {
+  const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event
 
-    if (active.id !== over.id) {
+    if (active.id !== over?.id) {
       const oldIndex = players.findIndex((item) => item.id === active.id)
-      const newIndex = players.findIndex((item) => item.id === over.id)
+      const newIndex = players.findIndex((item) => item.id === over?.id)
 
       const newItems = [...players]
       const [reorderedItem] = newItems.splice(oldIndex, 1)

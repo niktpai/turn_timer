@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import Layout from '@/components/Layout'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
@@ -14,11 +14,8 @@ interface Player {
   name: string
 }
 
-interface Props {
-  players: Player[]
-}
-
-export default function Settings({ players = [] }: Props) {
+function SettingsContent() {
+  const players: Player[] = []
   const router = useRouter()
   const searchParams = useSearchParams()
   const { settings, updateSettings, hasUnsavedChanges, saveChanges, resetChanges } = useSettings()
@@ -116,5 +113,13 @@ export default function Settings({ players = [] }: Props) {
         </div>
       </div>
     </Layout>
+  )
+}
+
+export default function Settings() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SettingsContent />
+    </Suspense>
   )
 }

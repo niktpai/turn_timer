@@ -1,17 +1,13 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
+import { Suspense } from 'react'
 import Layout from '@/components/Layout'
 import PlayerList from '@/components/PlayerList'
 import { Button } from '@/components/ui/button'
 import { usePlayers } from '@/contexts/PlayerContext'
 
-interface Player {
-  id: string
-  name: string
-}
-
-export default function Home() {
+function HomeContent() {
   const router = useRouter()
   const { players } = usePlayers()
 
@@ -32,5 +28,13 @@ export default function Home() {
         </div>
       </div>
     </Layout>
+  )
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <HomeContent />
+    </Suspense>
   )
 }

@@ -1,10 +1,11 @@
 'use client'
 
 import { useRouter } from 'next/navigation'
+import { Suspense } from 'react'
 import Layout from '@/components/Layout'
 import { Button } from '@/components/ui/button'
 
-export default function History() {
+function HistoryContent() {
   const router = useRouter()
 
   const handleStartNewGame = () => {
@@ -23,5 +24,13 @@ export default function History() {
         </div>
       </div>
     </Layout>
+  )
+}
+
+export default function History() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <HistoryContent />
+    </Suspense>
   )
 }

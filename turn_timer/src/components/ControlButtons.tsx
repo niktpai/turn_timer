@@ -4,7 +4,6 @@ import { Play, Plus, Pause } from 'lucide-react'
 interface ControlButtonsProps {
   onStart: () => void
   onAddTime: () => void
-  onSkip: () => void
   onPause: () => void
   isRunning: boolean
   isPaused: boolean
@@ -12,7 +11,7 @@ interface ControlButtonsProps {
   autoStart: boolean
 }
 
-export default function ControlButtons({ onStart, onAddTime, onSkip, onPause, isRunning, isPaused, addTimeInterval, autoStart }: ControlButtonsProps) {
+export default function ControlButtons({ onStart, onAddTime, onPause, isRunning, isPaused, addTimeInterval, autoStart }: ControlButtonsProps) {
   return (
     <div className="flex justify-center space-x-4">
       {!isRunning && !isPaused && !autoStart && (
