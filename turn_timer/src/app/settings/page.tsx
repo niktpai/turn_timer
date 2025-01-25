@@ -1,7 +1,7 @@
 'use client'
 
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useState, Suspense } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import Layout from '@/components/Layout'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
@@ -21,6 +21,12 @@ function SettingsContent() {
   const { settings, updateSettings, hasUnsavedChanges, saveChanges, resetChanges } = useSettings()
   const [turnDurationInput, setTurnDurationInput] = useState(settings.turnDuration.toString())
   const [addTimeInput, setAddTimeInput] = useState(settings.addTimeInterval.toString())
+
+  // Update input fields when settings change (e.g., after reset)
+  useEffect(() => {
+    setTurnDurationInput(settings.turnDuration.toString())
+    setAddTimeInput(settings.addTimeInterval.toString())
+  }, [settings])
 
   // Get the return path from URL params, default to home page
   const returnTo = searchParams.get('returnTo') || '/'

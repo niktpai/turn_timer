@@ -25,22 +25,35 @@ const defaultSettings: Settings = {
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined)
 
 export function SettingsProvider({ children }: { children: ReactNode }) {
-    const [settings, setSettings] = useState<Settings>(defaultSettings)
-    const [tempSettings, setTempSettings] = useState<Settings>(defaultSettings)
+    const loadStoredSettings = () => {
+        if (typeof window !== 'undefined') {
+            try {
+                const storedAutoStart = localStorage.getItem('autoStart')
+                const storedAddTimeInterval = localStorage.getItem('addTimeInterval')
+                const storedTurnDuration = localStorage.getItem('turnDuration')
 
-    useEffect(() => {
-        // Load saved settings on mount
-        const storedAutoStart = localStorage.getItem('autoStart')
-
-        const loadedSettings = {
-            autoStart: storedAutoStart ? JSON.parse(storedAutoStart) : defaultSettings.autoStart,
-            addTimeInterval: defaultSettings.addTimeInterval, // Always use default value (10) for addTimeInterval
-            turnDuration: defaultSettings.turnDuration, // Always use default value (60) for turnDuration
+                return {
+                    autoStart: storedAutoStart ? JSON.parse(storedAutoStart) : defaultSettings.autoStart,
+                    addTimeInterval: storedAddTimeInterval ? JSON.parse(storedAddTimeInterval) : defaultSettings.addTimeInterval,
+                    turnDuration: storedTurnDuration ? JSON.parse(storedTurnDuration) : defaultSettings.turnDuration,
+                }
+            } catch (error) {
+                console.error('Error loading settings:', error)
+                return defaultSettings
+            }
         }
+        return defaultSettings
+    }
 
-        setSettings(loadedSettings)
-        setTempSettings(loadedSettings)
-    }, [])
+    const [settings, setSettings] = useState<Settings>(loadStoredSettings)
+    const [tempSettings, setTempSettings] = useState<Settings>(loadStoredSettings)
+
+    // Reset temp settings to saved settings when unmounting settings page
+    useEffect(() => {
+        return () => {
+            setTempSettings(settings)
+        }
+    }, [settings])
 
     const updateSettings = (newSettings: Settings) => {
         setTempSettings(newSettings)
@@ -49,9 +62,16 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     const hasUnsavedChanges = JSON.stringify(settings) !== JSON.stringify(tempSettings)
 
     const saveChanges = () => {
-        // Save to localStorage and update current settings
-        localStorage.setItem('autoStart', JSON.stringify(tempSettings.autoStart))
-        // Don't save addTimeInterval or turnDuration to localStorage so they reset to defaults for new sessions
+        if (typeof window !== 'undefined') {
+            try {
+                // Save all settings to localStorage
+                localStorage.setItem('autoStart', JSON.stringify(tempSettings.autoStart))
+                localStorage.setItem('addTimeInterval', JSON.stringify(tempSettings.addTimeInterval))
+                localStorage.setItem('turnDuration', JSON.stringify(tempSettings.turnDuration))
+            } catch (error) {
+                console.error('Error saving settings:', error)
+            }
+        }
         setSettings(tempSettings)
     }
 
@@ -63,7 +83,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     return (
         <SettingsContext.Provider
             value={{
-                settings: tempSettings,
+                settings,  // Use actual saved settings from sessionStorage
                 updateSettings,
                 hasUnsavedChanges,
                 saveChanges,

@@ -14,15 +14,16 @@ function GameplayContent() {
   const router = useRouter()
   const { settings } = useSettings()
   const { players } = usePlayers()
-  const [isRunning, setIsRunning] = useState(settings.autoStart)
+  const [isRunning, setIsRunning] = useState(false)
   const [isPaused, setIsPaused] = useState(false)
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0)
   const [timeLeft, setTimeLeft] = useState(settings.turnDuration)
 
-  // Update timeLeft when turnDuration changes in settings
+  // Update state when settings change
   useEffect(() => {
+    setIsRunning(settings.autoStart)
     setTimeLeft(settings.turnDuration)
-  }, [settings.turnDuration])
+  }, [settings])
 
   // Ensure we have valid player indices
   const currentPlayer = players[currentPlayerIndex % players.length]
