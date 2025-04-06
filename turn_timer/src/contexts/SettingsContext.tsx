@@ -6,6 +6,7 @@ interface Settings {
     autoStart: boolean
     addTimeInterval: number
     turnDuration: number
+    darkMode: boolean
 }
 
 interface SettingsContextType {
@@ -20,40 +21,45 @@ const defaultSettings: Settings = {
     autoStart: true,
     addTimeInterval: 10,
     turnDuration: 60,
+    darkMode: false,
 }
 
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined)
 
 export function SettingsProvider({ children }: { children: ReactNode }) {
-    const loadStoredSettings = () => {
-        if (typeof window !== 'undefined') {
+    // Start with default settings for SSR
+    const [settings, setSettings] = useState<Settings>(defaultSettings)
+    const [tempSettings, setTempSettings] = useState<Settings>(defaultSettings)
+    const [isLoaded, setIsLoaded] = useState(false)
+    
+    // Load settings from localStorage only on client
+    useEffect(() => {
+        if (typeof window !== 'undefined' && !isLoaded) {
             try {
-                const storedAutoStart = localStorage.getItem('autoStart')
-                const storedAddTimeInterval = localStorage.getItem('addTimeInterval')
-                const storedTurnDuration = localStorage.getItem('turnDuration')
-
-                return {
-                    autoStart: storedAutoStart ? JSON.parse(storedAutoStart) : defaultSettings.autoStart,
-                    addTimeInterval: storedAddTimeInterval ? JSON.parse(storedAddTimeInterval) : defaultSettings.addTimeInterval,
-                    turnDuration: storedTurnDuration ? JSON.parse(storedTurnDuration) : defaultSettings.turnDuration,
+                // Load individual settings with fallbacks
+                const loadSetting = (key: string, defaultValue: any) => {
+                    const item = localStorage.getItem(key)
+                    return item ? JSON.parse(item) : defaultValue
                 }
+                
+                // Check system preference for dark mode as default if not set
+                const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches
+                
+                const loadedSettings = {
+                    autoStart: loadSetting('autoStart', defaultSettings.autoStart),
+                    addTimeInterval: loadSetting('addTimeInterval', defaultSettings.addTimeInterval),
+                    turnDuration: loadSetting('turnDuration', defaultSettings.turnDuration),
+                    darkMode: loadSetting('darkMode', prefersDarkMode),
+                }
+                
+                setSettings(loadedSettings)
+                setTempSettings(loadedSettings)
+                setIsLoaded(true)
             } catch (error) {
                 console.error('Error loading settings:', error)
-                return defaultSettings
             }
         }
-        return defaultSettings
-    }
-
-    const [settings, setSettings] = useState<Settings>(loadStoredSettings)
-    const [tempSettings, setTempSettings] = useState<Settings>(loadStoredSettings)
-
-    // Reset temp settings to saved settings when unmounting settings page
-    useEffect(() => {
-        return () => {
-            setTempSettings(settings)
-        }
-    }, [settings])
+    }, [isLoaded])
 
     const updateSettings = (newSettings: Settings) => {
         setTempSettings(newSettings)
@@ -68,6 +74,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
                 localStorage.setItem('autoStart', JSON.stringify(tempSettings.autoStart))
                 localStorage.setItem('addTimeInterval', JSON.stringify(tempSettings.addTimeInterval))
                 localStorage.setItem('turnDuration', JSON.stringify(tempSettings.turnDuration))
+                localStorage.setItem('darkMode', JSON.stringify(tempSettings.darkMode))
             } catch (error) {
                 console.error('Error saving settings:', error)
             }
@@ -76,14 +83,13 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
     }
 
     const resetChanges = () => {
-        // Reset temp settings to current settings
         setTempSettings(settings)
     }
 
     return (
         <SettingsContext.Provider
             value={{
-                settings,  // Use actual saved settings from sessionStorage
+                settings,
                 updateSettings,
                 hasUnsavedChanges,
                 saveChanges,

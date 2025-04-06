@@ -15,20 +15,20 @@ function LayoutContent({ children, title }: LayoutProps) {
   const returnTo = searchParams.get('returnTo') || '/'
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <header className="p-4 flex justify-between items-center border-b">
-        <h1 className="text-2xl font-bold">{title}</h1>
+    <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
+      <header className="p-4 flex justify-between items-center border-b transition-colors duration-300">
+        <h1 className="text-2xl font-bold transition-colors duration-300">{title}</h1>
         {isSettingsPage ? (
-          <Link href={returnTo} className="text-muted-foreground hover:text-foreground transition-colors">
+          <Link href={returnTo} className="text-muted-foreground hover:text-foreground transition-colors duration-300">
             <X size={24} />
           </Link>
         ) : (
-          <Link href={`/settings?returnTo=${pathname}`} className="text-muted-foreground hover:text-foreground transition-colors">
+          <Link href={`/settings?returnTo=${pathname}`} className="text-muted-foreground hover:text-foreground transition-colors duration-300">
             <Settings size={24} />
           </Link>
         )}
       </header>
-      <main className="p-4">{children}</main>
+      <main className="p-4 transition-colors duration-300">{children}</main>
     </div>
   )
 }

@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { useSettings } from '@/contexts/SettingsContext'
+import { ThemeToggle } from '@/components/ThemeToggle'
 
 interface Player {
   id: string
@@ -108,6 +109,15 @@ function SettingsContent() {
             ))}
           </ul>
         </div>
+
+        {/* Dark Mode Toggle - takes effect immediately */}
+        <div className="space-y-2">
+          <div className="text-sm text-muted-foreground mb-2">
+            Theme preference is saved immediately
+          </div>
+          <ThemeToggle />
+        </div>
+
         <div className="flex justify-between">
           <Button variant="outline" onClick={handleClose}>Close</Button>
           <Button
