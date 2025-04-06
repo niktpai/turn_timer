@@ -9,7 +9,7 @@ import { useSettings } from "@/contexts/SettingsContext"
 
 export function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme()
-  const { settings, updateSettings, saveChanges } = useSettings()
+  const { settings } = useSettings()
   const [mounted, setMounted] = useState(false)
   
   // Just a simple mount effect
@@ -27,9 +27,10 @@ export function ThemeToggle() {
     const newTheme = resolvedTheme === 'dark' ? 'light' : 'dark'
     setTheme(newTheme)
     
-    // Save to settings
-    updateSettings({ ...settings, darkMode: newTheme === 'dark' })
-    saveChanges()
+    // Save only the theme setting directly to localStorage without affecting other settings
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('darkMode', JSON.stringify(newTheme === 'dark'))
+    }
   }
 
   const isDark = resolvedTheme === 'dark'
