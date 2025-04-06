@@ -5,11 +5,9 @@ import { useEffect, useState } from "react"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { Moon, Sun } from "lucide-react"
-import { useSettings } from "@/contexts/SettingsContext"
 
 export function ThemeToggle() {
   const { resolvedTheme, setTheme } = useTheme()
-  const { settings } = useSettings()
   const [mounted, setMounted] = useState(false)
   
   // Just a simple mount effect

@@ -1,10 +1,8 @@
-# turn_timer
-Here’s a structured plan and README outline for your project, addressing your goals and needs while maintaining clarity and flexibility.
+# Turn Timer App for Board Games
+
+**Live App**: [https://turn-timer-c3aec.web.app/](https://turn-timer-c3aec.web.app/)
 
 ---
-
-## **Project README Draft**
-**Title**: **Turn Timer App for Board Games**
 
 ### **Overview**
 The Turn Timer App is a web-based tool designed to streamline board games by keeping turns on track and providing insightful stats on gameplay. This app aims to make games more enjoyable by reducing downtime and allowing players to focus on strategy and fun.
@@ -48,8 +46,7 @@ The Turn Timer App is a web-based tool designed to streamline board games by kee
    - Notify players when their turn starts or ends.
 5. **Dark Mode**:
    - Improve visibility in low-light settings.
-6. **Leaderboards and History**:
-   - Track and save past game performance.
+
 
 ---
 
@@ -139,7 +136,3 @@ The Turn Timer App is a web-based tool designed to streamline board games by kee
 4. **Week 4**:
    - Test thoroughly.
    - Launch officially and gather feedback.
-
----
-
-What do you think of this plan? Let me know if you'd like any section expanded or adjusted!

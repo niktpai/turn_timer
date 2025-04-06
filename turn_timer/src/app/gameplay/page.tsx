@@ -134,12 +134,12 @@ function GameplayContent() {
           <br />
           Previous Player: {previousPlayer.name}
         </div>
-        <div className="flex flex-col items-center space-y-4">
-          <Button onClick={handleNextTurn} size="lg">
-            Next Turn
-          </Button>
+        <div className="flex flex-row justify-center gap-4">
           <Button onClick={handlePreviousTurn} size="lg">
             Previous Turn
+          </Button>
+          <Button onClick={handleNextTurn} size="lg">
+            Next Turn
           </Button>
         </div>
         <div className="flex justify-end">

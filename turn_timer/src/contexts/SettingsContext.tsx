@@ -33,7 +33,7 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
         if (typeof window !== 'undefined' && !isLoaded) {
             try {
                 // Load individual settings with fallbacks
-                const loadSetting = (key: string, defaultValue: any) => {
+                const loadSetting = <T extends boolean | number>(key: string, defaultValue: T): T => {
                     const item = localStorage.getItem(key)
                     return item ? JSON.parse(item) : defaultValue
                 }

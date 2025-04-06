@@ -10,13 +10,7 @@ import { Button } from '@/components/ui/button'
 import { useSettings } from '@/contexts/SettingsContext'
 import { ThemeToggle } from '@/components/ThemeToggle'
 
-interface Player {
-  id: string
-  name: string
-}
-
 function SettingsContent() {
-  const players: Player[] = []
   const router = useRouter()
   const searchParams = useSearchParams()
   const { settings, updateSettings } = useSettings()
