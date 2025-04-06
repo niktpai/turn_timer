@@ -99,8 +99,9 @@ function GameplayContent() {
 
   if (!players || players.length === 0) {
     return (
-      <div className="text-center p-4">
-        No players available. Please add players in the settings.
+      <div className="text-center p-4 space-y-4">
+        <div>No players available. Please add players in the homepage.</div>
+        <Button onClick={() => router.push("/")}>Go to Homepage</Button>
       </div>
     );
   }
