@@ -19,7 +19,7 @@ function SettingsContent() {
   const players: Player[] = []
   const router = useRouter()
   const searchParams = useSearchParams()
-  const { settings, updateSettings, hasUnsavedChanges, saveChanges, resetChanges } = useSettings()
+  const { settings, updateSettings } = useSettings()
   const [turnDurationInput, setTurnDurationInput] = useState(settings.turnDuration.toString())
   const [addTimeInput, setAddTimeInput] = useState(settings.addTimeInterval.toString())
 
@@ -32,15 +32,7 @@ function SettingsContent() {
   // Get the return path from URL params, default to home page
   const returnTo = searchParams.get('returnTo') || '/'
 
-  const handleSave = () => {
-    saveChanges()
-    router.push(returnTo)
-  }
-
-  const handleClose = () => {
-    if (hasUnsavedChanges) {
-      resetChanges()
-    }
+  const handleReturn = () => {
     router.push(returnTo)
   }
 
@@ -51,7 +43,7 @@ function SettingsContent() {
           <Switch
             id="auto-start"
             checked={settings.autoStart}
-            onCheckedChange={(checked) => updateSettings({ ...settings, autoStart: checked })}
+            onCheckedChange={(checked) => updateSettings({ autoStart: checked })}
           />
           <Label htmlFor="auto-start">Auto Start Next Turn</Label>
         </div>
@@ -64,15 +56,15 @@ function SettingsContent() {
             pattern="[0-9]*"
             value={turnDurationInput}
             onChange={(e) => {
-              const value = e.target.value
-              setTurnDurationInput(value)
-              if (value === '') {
-                updateSettings({ ...settings, turnDuration: 1 })
+              setTurnDurationInput(e.target.value)
+            }}
+            onBlur={() => {
+              const num = parseInt(turnDurationInput)
+              if (!isNaN(num) && num > 0) {
+                updateSettings({ turnDuration: num })
               } else {
-                const num = parseInt(value)
-                if (!isNaN(num) && num > 0) {
-                  updateSettings({ ...settings, turnDuration: num })
-                }
+                // Reset input to current setting if invalid
+                setTurnDurationInput(settings.turnDuration.toString())
               }
             }}
           />
@@ -86,46 +78,27 @@ function SettingsContent() {
             pattern="[0-9]*"
             value={addTimeInput}
             onChange={(e) => {
-              const value = e.target.value
-              setAddTimeInput(value)
-              if (value === '') {
-                updateSettings({ ...settings, addTimeInterval: 0 })
+              setAddTimeInput(e.target.value)
+            }}
+            onBlur={() => {
+              const num = parseInt(addTimeInput)
+              if (!isNaN(num) && num >= 0) {
+                updateSettings({ addTimeInterval: num })
               } else {
-                const num = parseInt(value)
-                if (!isNaN(num) && num >= 0) {
-                  updateSettings({ ...settings, addTimeInterval: num })
-                }
+                // Reset input to current setting if invalid
+                setAddTimeInput(settings.addTimeInterval.toString())
               }
             }}
           />
         </div>
-        <div className="space-y-2">
-          <Label>Current Turn Order</Label>
-          <ul className="space-y-2">
-            {players.map((player, index) => (
-              <li key={player.id} className="bg-secondary p-2 rounded">
-                {index + 1}. {player.name}
-              </li>
-            ))}
-          </ul>
-        </div>
 
-        {/* Dark Mode Toggle - takes effect immediately */}
+        {/* Dark Mode Toggle */}
         <div className="space-y-2">
-          <div className="text-sm text-muted-foreground mb-2">
-            Theme preference is saved immediately
-          </div>
           <ThemeToggle />
         </div>
 
-        <div className="flex justify-between">
-          <Button variant="outline" onClick={handleClose}>Close</Button>
-          <Button
-            onClick={handleSave}
-            disabled={!hasUnsavedChanges}
-          >
-            Save Changes
-          </Button>
+        <div className="flex justify-center">
+          <Button variant="outline" onClick={handleReturn}>Return</Button>
         </div>
       </div>
     </Layout>

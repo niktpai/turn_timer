@@ -11,10 +11,7 @@ interface Settings {
 
 interface SettingsContextType {
     settings: Settings
-    updateSettings: (newSettings: Settings) => void
-    hasUnsavedChanges: boolean
-    saveChanges: () => void
-    resetChanges: () => void
+    updateSettings: (newSettings: Partial<Settings>) => void
 }
 
 const defaultSettings: Settings = {
@@ -29,7 +26,6 @@ const SettingsContext = createContext<SettingsContextType | undefined>(undefined
 export function SettingsProvider({ children }: { children: ReactNode }) {
     // Start with default settings for SSR
     const [settings, setSettings] = useState<Settings>(defaultSettings)
-    const [tempSettings, setTempSettings] = useState<Settings>(defaultSettings)
     const [isLoaded, setIsLoaded] = useState(false)
     
     // Load settings from localStorage only on client
@@ -53,7 +49,6 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
                 }
                 
                 setSettings(loadedSettings)
-                setTempSettings(loadedSettings)
                 setIsLoaded(true)
             } catch (error) {
                 console.error('Error loading settings:', error)
@@ -61,39 +56,30 @@ export function SettingsProvider({ children }: { children: ReactNode }) {
         }
     }, [isLoaded])
 
-    const updateSettings = (newSettings: Settings) => {
-        setTempSettings(newSettings)
-    }
-
-    const hasUnsavedChanges = JSON.stringify(settings) !== JSON.stringify(tempSettings)
-
-    const saveChanges = () => {
+    const updateSettings = (newSettings: Partial<Settings>) => {
+        const updatedSettings = { ...settings, ...newSettings }
+        
+        // Save to localStorage immediately
         if (typeof window !== 'undefined') {
             try {
-                // Save all settings to localStorage
-                localStorage.setItem('autoStart', JSON.stringify(tempSettings.autoStart))
-                localStorage.setItem('addTimeInterval', JSON.stringify(tempSettings.addTimeInterval))
-                localStorage.setItem('turnDuration', JSON.stringify(tempSettings.turnDuration))
-                localStorage.setItem('darkMode', JSON.stringify(tempSettings.darkMode))
+                // Only save the changed settings
+                Object.entries(newSettings).forEach(([key, value]) => {
+                    localStorage.setItem(key, JSON.stringify(value))
+                })
             } catch (error) {
                 console.error('Error saving settings:', error)
             }
         }
-        setSettings(tempSettings)
-    }
-
-    const resetChanges = () => {
-        setTempSettings(settings)
+        
+        // Update state
+        setSettings(updatedSettings)
     }
 
     return (
         <SettingsContext.Provider
             value={{
                 settings,
-                updateSettings,
-                hasUnsavedChanges,
-                saveChanges,
-                resetChanges
+                updateSettings
             }}
         >
             {children}
